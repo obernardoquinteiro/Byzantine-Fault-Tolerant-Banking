@@ -1,0 +1,39 @@
+//
+// Protocol buffers definition
+//
+syntax = "proto3";
+package pt.tecnico.bank.grpc;
+
+option java_multiple_files = true;
+
+
+message EchoRequest {
+  bytes signature = 1;
+  bytes server_pubkey = 2;
+  int32 nonce = 3;
+  string server_name = 4;
+  string input = 5;
+}
+
+message EchoResponse {
+   bytes params = 1;
+   bytes signature = 2;
+}
+
+message ReadyRequest {
+  bytes signature = 1;
+  bytes server_pubkey = 2;
+  int32 nonce = 3;
+  string server_name = 4;
+  string input = 5;
+}
+
+message ReadyResponse {
+  bytes params = 1;
+  bytes signature = 2;
+}
+
+service ADEBService {
+  rpc echo(EchoRequest) returns (EchoResponse);
+  rpc ready(ReadyRequest) returns (ReadyResponse);
+}

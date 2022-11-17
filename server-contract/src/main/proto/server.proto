@@ -1,0 +1,206 @@
+//
+// Protocol buffers definition
+//
+syntax = "proto3";
+package pt.tecnico.bank.grpc;
+
+option java_multiple_files = true;
+
+
+message Transaction {
+  string sourceUsername = 1;
+  string destUsername = 2;
+  int32 amount = 3;
+  bytes source = 4;
+  bytes destination = 5;
+  int32 wid = 6;
+  bytes signature = 7;
+}
+
+message ProofOfWorkRequest {
+  bytes public_key = 1;
+  int32 nonce = 2;
+  bytes signature = 4;
+}
+
+message ProofOfWorkResponse {
+  int32 nonce = 1;
+  bytes challenge = 2;
+  bytes server_pubkey = 3;
+  string message = 4;
+  int32 port = 5;
+  bytes signature = 6;
+}
+
+
+message PingRequest {
+  string input = 1;
+}
+
+message PingResponse {
+	string output = 1;
+}
+
+message RidRequest {
+  bytes public_key = 1;
+}
+
+message RidResponse {
+  bytes server_pub_key = 1;
+  int32 rid = 2;
+  string message = 3;
+
+  bytes signature = 4;
+}
+
+
+
+message OpenAccountRequest {
+  bytes public_key = 1;
+  string username = 2;
+  int32 wid = 3;
+  int32 balance = 4;
+  bytes pairSign = 5;
+
+  bytes signature = 6;
+}
+
+message OpenAccountResponse {
+  string message = 1;
+  bytes public_key = 2;
+  bytes signature = 3;
+}
+
+
+message CheckAccountRequest {
+  bytes public_key = 1;
+  bytes my_public_key = 2;
+  int32 rid = 3;
+  int32 nonce = 4;
+  int64 pow = 5;
+  bytes concatenated = 6;
+  bytes signature = 7;
+}
+
+message CheckAccountResponse {
+  int32 balance = 1;
+  int32 wid = 2;
+  bytes pairSign = 3;
+
+  int32 rid = 4;
+  bytes public_key = 5;
+  string message = 6;
+
+  repeated Transaction transactions = 7;
+  int32 nonce = 8;
+
+  bytes signature = 9;
+}
+
+message SendAmountRequest {
+  Transaction transaction = 1;
+
+  int32 new_balance = 2;
+  bytes pairSign = 3;
+
+  bytes signature = 4;
+}
+
+message SendAmountResponse {
+  string message = 1;
+  bytes public_key = 2;
+  int32 wid = 3;
+  bytes signature = 4;
+}
+
+
+
+message ReceiveAmountRequest {
+  bytes public_key = 1;
+
+  int32 future_balance = 2;
+  int32 wid = 3;
+  bytes pairSign = 4;
+
+  int32 transfer = 5;
+  Transaction to_audit_transaction = 6;
+  bytes signature = 7;
+}
+
+message ReceiveAmountResponse {
+  bytes public_key = 1;
+  int32 wid = 2;
+  string message = 3;
+
+  bytes signature = 4;
+}
+
+
+
+message AuditRequest {
+  bytes public_key = 1;
+  bytes my_public_key = 2;
+  int32 nonce = 3;
+  int32 rid = 4;
+  int64 pow = 5;
+  bytes concatenated = 6;
+  bytes signature = 7;
+}
+
+message AuditResponse {
+  bytes public_key = 1;
+  repeated Transaction transactions = 2;
+  int32 nonce = 3;
+  int32 rid = 4;
+
+  string message = 5;
+  bytes signature = 6;
+}
+
+
+message CheckWriteBackRequest {
+  repeated Transaction transactions = 1;
+
+  int32 balance = 2;
+  int32 wid = 3;
+  bytes pairSign = 4;
+
+  bytes public_key = 5;
+  bytes my_public_key = 6;
+
+  bytes signature = 7;
+}
+
+message CheckWriteBackResponse {
+  string message = 1;
+  bytes public_key = 2;
+  bytes signature = 3;
+}
+
+message AuditWriteBackRequest {
+  repeated Transaction transactions = 1;
+
+  bytes public_key = 2;
+  bytes my_public_key = 3;
+  bytes signature = 4;
+}
+
+message AuditWriteBackResponse {
+  string message = 1;
+  bytes public_key = 2;
+  bytes signature = 3;
+}
+
+
+service ServerService {
+  rpc ping(PingRequest) returns (PingResponse);
+  rpc proof(ProofOfWorkRequest) returns (ProofOfWorkResponse);
+  rpc rid(RidRequest) returns (RidResponse);
+  rpc openAccount(OpenAccountRequest) returns (OpenAccountResponse);
+  rpc sendAmount(SendAmountRequest) returns (SendAmountResponse);
+  rpc checkAccount(CheckAccountRequest) returns (CheckAccountResponse);
+  rpc receiveAmount(ReceiveAmountRequest) returns (ReceiveAmountResponse);
+  rpc audit(AuditRequest) returns (AuditResponse);
+  rpc checkWriteBack(CheckWriteBackRequest) returns (CheckWriteBackResponse);
+  rpc auditWriteBack(AuditWriteBackRequest) returns (AuditWriteBackResponse);
+}
